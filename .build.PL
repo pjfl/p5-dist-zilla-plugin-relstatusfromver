@@ -1,26 +1,12 @@
 use strict;
 use warnings;
 
-use Module::Build 0.4004;
+use Module::Build ##{ $meta2{prereqs}->{configure}->{requires}->{'Module::Build'} ##};
 
-my $perl_ver = 5.008;
-my $name     = 'Dist-Zilla-Plugin-RelStatusFromVer'; $name =~ s{ - }{::}gmx;
+my $perl_ver = ##{ $meta2{prereqs}->{runtime}->{requires}->{perl} ##};
+my $name     = '##{ $zilla->name ##}'; $name =~ s{ - }{::}gmx;
 my $prereqs  = {
-  'build_requires' => {
-    'Module::Build' => '0.4004',
-    'Test::Requires' => '0.06',
-    'version' => '0.88'
-  },
-  'configure_requires' => {
-    'Module::Build' => '0.4004',
-    'version' => '0.88'
-  },
-  'requires' => {
-    'Dist::Zilla' => '5.037',
-    'Moose' => '2.1405',
-    'Perl::Version' => '1.013',
-    'perl' => '5.008'
-  },
+##{ $plugin->get_prereqs( 1 ) ##}
 };
 my $testing  = sub { $ENV{AUTOMATED_TESTING}
                   || $ENV{PERL_CPAN_REPORTER_CONFIG}
@@ -40,7 +26,7 @@ Module::Build->new(
    'module_name' => $name,
    'notes'       => { min_perl_version => $perl_ver, testing => $testing->() },
    %{ $prereqs },
-
+##{ $plugin->get_default('share_dir') ##}
 )->create_build_script;
 
 exit 0;

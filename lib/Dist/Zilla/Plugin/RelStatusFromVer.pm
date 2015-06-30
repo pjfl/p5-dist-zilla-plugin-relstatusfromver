@@ -1,14 +1,26 @@
 package Dist::Zilla::Plugin::RelStatusFromVer;
 
-use 5.010001;
-use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.1.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use 5.008;
+use version; our $VERSION = qv( sprintf '0.1.%d', q$Rev: 2 $ =~ /\d+/gmx );
 
-use Class::Usul::Constants;
-use Class::Usul::Functions  qw( throw );
-use Moo;
+use Moose;
+use Perl::Version;
 
-extends q(Class::Usul::Programs);
+with 'Dist::Zilla::Role::ReleaseStatusProvider';
+
+has 'threshold' => is => 'ro', isa => 'Int', default => 1;
+
+sub provide_release_status {
+   my $self = shift;
+
+   my ($subversion) = Perl::Version->new( $self->zilla->version )->subversion;
+
+   return $subversion && $subversion > $self->threshold ? 'testing' : 'stable';
+}
+
+__PACKAGE__->meta->make_immutable;
+
+no Moose;
 
 1;
 
@@ -20,14 +32,17 @@ __END__
 
 =head1 Name
 
-Dist::Zilla::Plugin::RelStatusFromVer - One-line description of the modules purpose
+Dist::Zilla::Plugin::RelStatusFromVer - Derive the release status from the distributions version
 
 =head1 Synopsis
 
-   use Dist::Zilla::Plugin::RelStatusFromVer;
-   # Brief but working code examples
+   ; In dist.ini
+   [RelStatusFromVer]
 
 =head1 Description
+
+Extracts the subversion from the distributions version and, if it exceeds the
+threshold attribute, sets the release status to C<testing>
 
 =head1 Configuration and Environment
 
@@ -35,17 +50,31 @@ Defines the following attributes;
 
 =over 3
 
+=item C<threshold>
+
+An integer that defaults to 1
+
 =back
 
 =head1 Subroutines/Methods
 
+=head2 C<provide_release_status>
+
+Uses the distributions subversion number to determine the release status
+
 =head1 Diagnostics
+
+None
 
 =head1 Dependencies
 
 =over 3
 
-=item L<Class::Usul>
+=item L<Dist::Zilla>
+
+=item L<Moose>
+
+=item L<Perl::Version>
 
 =back
 

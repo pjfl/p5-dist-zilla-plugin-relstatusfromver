@@ -1,5 +1,5 @@
 Revision history for Dist::Zilla::Plugin::RelStatusFromVer
 
-0.1.1     2015-06-29 10:00:46
+          - Implements release status provider
           - Added project files to master branch
 
